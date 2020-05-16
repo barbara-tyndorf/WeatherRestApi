@@ -2,7 +2,6 @@ package pl.sda.WeatherRestApi.location;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -18,23 +17,21 @@ public class LocationService {
         this.locationRepository = locationRepository;
     }
 
-    public List<Location> getAll() {
-        return locationRepository.getAll();
-    }
-
-
     public Location add(Location location) {
-        locationRepository.getAll().stream()
-                .filter((Location l) -> l.getId() == location.getId())
-                .findAny()
-                .ifPresent((l) -> {
-                    throw new IllegalArgumentException("Location already exist!");
-                });
+//        locationRepository.getAll().stream()
+//                .filter((Location l) -> l.getId() == location.getId())
+//                .findAny()
+//                .ifPresent((l) -> {
+//                    throw new IllegalArgumentException("Location already exist!");
+//                });
         locationRepository.add(location);
         return location;
     }
 
-    @GetMapping
+    public List<Location> getAll() {
+        return locationRepository.getAll();
+    }
+
     public Location findByLongAndLat(double longi, double lat) {
         return locationRepository.getAll().stream()
                 .filter((l) -> l.getLongitude() == longi)
@@ -43,6 +40,14 @@ public class LocationService {
                 .orElseThrow(() -> {
                     throw new NoSuchElementException("There is no location with provided geographic coordinates");
                 });
+    }
+
+    public Location updateLocation(Location location) {
+        return locationRepository.update(location);
+    }
+
+    public void deleteLocation(Location location) {
+        locationRepository.delete(location);
     }
 
     public List<Location> findByName(String name) {
@@ -60,18 +65,4 @@ public class LocationService {
                 });
     }
 
-    public Location updateLocation(Location location) {
-        LocationService locationService = new LocationService(locationRepository);
-        Location locationToUpdate =
-                locationService.findByLongAndLat(location.getLongitude(), location.getLatitude());
-        locationToUpdate = location;
-        return location;
-    }
-
-    public void deleteLocation(Location location) {
-        LocationService locationService = new LocationService(locationRepository);
-        Location locationToDelete =
-                locationService.findByLongAndLat(location.getLongitude(), location.getLatitude());
-        locationRepository.delete(locationToDelete);
-    }
 }

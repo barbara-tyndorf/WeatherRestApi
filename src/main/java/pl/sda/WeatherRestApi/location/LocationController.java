@@ -28,7 +28,7 @@ public class LocationController {
     }
 
     @PutMapping
-    public Location update (Location location) {
+    public Location update (@Valid @RequestBody Location location) {
         locationService.updateLocation(location);
         return location;
     }
