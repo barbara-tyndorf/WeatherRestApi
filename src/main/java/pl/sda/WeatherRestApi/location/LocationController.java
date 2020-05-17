@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @RequestMapping("/location")
 @RestController
@@ -13,13 +15,8 @@ public class LocationController {
     private final LocationService locationService;
 
     @Autowired
-    public LocationController (LocationService locationService){
+    public LocationController(LocationService locationService) {
         this.locationService = locationService;
-    }
-
-    @GetMapping
-    public List<Location> getAll() {
-        return locationService.getAll();
     }
 
     @PostMapping
@@ -27,14 +24,33 @@ public class LocationController {
         return locationService.add(location);
     }
 
+    @GetMapping
+    public List<Location> getAll() {
+        return locationService.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public Location getLocationById(@PathVariable String id) {
+        return locationService.findById(id);
+    }
+
+    @GetMapping("/find")
+    public List<Location> getLocations(@RequestParam(required = false) Map<String, String> params) {
+        return locationService.findBy(params);
+    }
+
+    @GetMapping("/name")
+    public List<Location> getLocationByName(@RequestParam String name, @RequestParam int start, @RequestParam int size) {
+        return locationService.findAllByName(name, start, size);
+    }
+
     @PutMapping
-    public Location update (@Valid @RequestBody Location location) {
-        locationService.updateLocation(location);
-        return location;
+    public Location update(@RequestParam String id, @Valid @RequestParam Map<String, String> params) {
+        return locationService.updateLocation(id, params);
     }
 
     @DeleteMapping
-    public String delete (Location location) {
+    public String delete(Location location) {
         locationService.deleteLocation(location);
         return "Location removed successfully!";
     }

@@ -1,11 +1,19 @@
 package pl.sda.WeatherRestApi.location;
 
+import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.validation.constraints.*;
+import java.util.Objects;
 
-
+@Entity
 public class Location {
 
-    @NotNull
+    @Id
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String id;
 
     @Min(-180)
@@ -27,6 +35,10 @@ public class Location {
     @NotBlank
     @NotEmpty
     private String country;
+
+
+    public Location() {
+    }
 
     public Location(String id, double longitude, double latitude, String name, String region, String country) {
         this.id = id;
@@ -83,5 +95,35 @@ public class Location {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    @Override
+    public String toString() {
+        return "Location{" +
+                "id='" + id + '\'' +
+                ", longitude=" + longitude +
+                ", latitude=" + latitude +
+                ", name='" + name + '\'' +
+                ", region='" + region + '\'' +
+                ", country='" + country + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Location location = (Location) o;
+        return Double.compare(location.longitude, longitude) == 0 &&
+                Double.compare(location.latitude, latitude) == 0 &&
+                Objects.equals(id, location.id) &&
+                Objects.equals(name, location.name) &&
+                Objects.equals(region, location.region) &&
+                Objects.equals(country, location.country);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, longitude, latitude, name, region, country);
     }
 }

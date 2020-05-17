@@ -1,68 +1,105 @@
 package pl.sda.WeatherRestApi.location;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import pl.sda.WeatherRestApi.location.errors.LocationExistException;
+import pl.sda.WeatherRestApi.location.errors.NoLocationsFoundException;
 
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
+
 
 @Service
 public class LocationService {
 
-    private final LocationRepository locationRepository;
+    private final LocationDBRepository locationRepository;
 
     @Autowired
-    public LocationService(LocationRepository locationRepository) {
+    public LocationService(LocationDBRepository locationRepository) {
         this.locationRepository = locationRepository;
     }
 
     public Location add(Location location) {
-//        locationRepository.getAll().stream()
-//                .filter((Location l) -> l.getId() == location.getId())
-//                .findAny()
-//                .ifPresent((l) -> {
-//                    throw new IllegalArgumentException("Location already exist!");
-//                });
-        locationRepository.add(location);
-        return location;
-    }
-
-    public List<Location> getAll() {
-        return locationRepository.getAll();
-    }
-
-    public Location findByLongAndLat(double longi, double lat) {
-        return locationRepository.getAll().stream()
-                .filter((l) -> l.getLongitude() == longi)
-                .filter((l) -> l.getLatitude() == lat)
-                .findFirst()
-                .orElseThrow(() -> {
-                    throw new NoSuchElementException("There is no location with provided geographic coordinates");
+        locationRepository.findAll().stream()
+                .filter((Location l) -> l.getLatitude() == location.getLatitude())
+                .filter((Location l) -> l.getLongitude() == location.getLongitude())
+                .findAny()
+                .ifPresent((l) -> {
+                    throw new LocationExistException(location);
                 });
+        return locationRepository.save(location);
     }
 
-    public Location updateLocation(Location location) {
-        return locationRepository.update(location);
+    public Location updateLocation(String id, Map<String, String> params) {
+        locationRepository.findById(id)
+                .ifPresent((l) -> {
+                    if (params.containsKey("name")) {
+                        l.setName(params.get("name"));
+                    }
+                    if (params.containsKey("region")) {
+                        l.setRegion(params.get("region"));
+                    }
+                    if (params.containsKey("country")) {
+                        l.setCountry(params.get("country"));
+                    }
+                    if (params.containsKey("longitude")) {
+                        l.setLongitude(Double.parseDouble(params.get("longitude")));
+                    }
+                    if (params.containsKey("latitude")) {
+                        l.setLatitude(Double.parseDouble(params.get("latitude")));
+                    }
+                });
+        return locationRepository.findById(id).orElseThrow(() -> {
+            throw new NoLocationsFoundException();
+        });
+    }
+
+    public List<Location> findBy(Map<String, String> params) {
+        List<Location> foundLocations = new ArrayList<>();
+
+        if (params.containsKey("id")) {
+            String id = params.get("id");
+            locationRepository.findById(id).ifPresent(foundLocations::add);
+        }
+        if (params.containsKey("longitude") && params.containsKey("latitude")) {
+            double longi = Double.parseDouble(params.get("longitude"));
+            double lat = Double.parseDouble(params.get("latitude"));
+            locationRepository.findByLongitudeAndLatitude(longi, lat).ifPresent(foundLocations::add);
+        }
+        if (params.containsKey("name")) {
+            foundLocations.addAll(locationRepository.findByName(params.get("name")));
+        }
+        if (params.containsKey("region")) {
+            foundLocations.addAll(locationRepository.findByRegion(params.get("region")));
+        }
+        if (params.containsKey("country")) {
+            foundLocations.addAll(locationRepository.findByCountry(params.get("country")));
+        }
+        return foundLocations;
+    }
+
+    public List<Location> findAllByName(String name, int start, int size) {
+        Pageable pageable = PageRequest.of(start, size);
+        return locationRepository.findAllByName(name, pageable);
+    }
+
+    public Location findById(String id) {
+        return locationRepository.findById(id)
+                .orElseThrow(() -> {
+                    throw new NoLocationsFoundException();
+                });
     }
 
     public void deleteLocation(Location location) {
         locationRepository.delete(location);
     }
 
-    public List<Location> findByName(String name) {
-        return locationRepository.getAll().stream()
-                .filter((l) -> l.getName().equals(name))
-                .collect(Collectors.toList());
-    }
-
-    public Location findById(String id) {
-        return locationRepository.getAll().stream()
-                .filter((l) -> l.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> {
-                    throw new NoSuchElementException("There is no location with provided id");
-                });
+    public List<Location> getAll() {
+        return locationRepository.findAll();
     }
 
 }
