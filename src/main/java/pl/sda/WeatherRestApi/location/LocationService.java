@@ -1,8 +1,6 @@
 package pl.sda.WeatherRestApi.location;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -10,7 +8,6 @@ import pl.sda.WeatherRestApi.location.errors.LocationExistException;
 import pl.sda.WeatherRestApi.location.errors.NoLocationsFoundException;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -35,27 +32,25 @@ public class LocationService {
     }
 
     public Location updateLocation(String id, Map<String, String> params) {
-        locationRepository.findById(id)
-                .ifPresent((l) -> {
-                    if (params.containsKey("name")) {
-                        l.setName(params.get("name"));
-                    }
-                    if (params.containsKey("region")) {
-                        l.setRegion(params.get("region"));
-                    }
-                    if (params.containsKey("country")) {
-                        l.setCountry(params.get("country"));
-                    }
-                    if (params.containsKey("longitude")) {
-                        l.setLongitude(Double.parseDouble(params.get("longitude")));
-                    }
-                    if (params.containsKey("latitude")) {
-                        l.setLatitude(Double.parseDouble(params.get("latitude")));
-                    }
-                });
-        return locationRepository.findById(id).orElseThrow(() -> {
+        Location location = locationRepository.findById(id).orElseThrow(() -> {
             throw new NoLocationsFoundException();
         });
+        if (params.containsKey("name")) {
+            location.setName(params.get("name"));
+        }
+        if (params.containsKey("region")) {
+            location.setRegion(params.get("region"));
+        }
+        if (params.containsKey("country")) {
+            location.setCountry(params.get("country"));
+        }
+        if (params.containsKey("longitude")) {
+            location.setLongitude(Double.parseDouble(params.get("longitude")));
+        }
+        if (params.containsKey("latitude")) {
+            location.setLatitude(Double.parseDouble(params.get("latitude")));
+        }
+        return locationRepository.save(location);
     }
 
     public List<Location> findBy(Map<String, String> params) {
@@ -102,4 +97,12 @@ public class LocationService {
         return locationRepository.findAll();
     }
 
+    public List<Location> sortBy(String sort) {
+
+        if (sort.equals("desc")) {
+            return locationRepository.findByOrderByCountryDescNameDesc();
+        } else {
+            return locationRepository.findByOrderByCountryAscNameAsc();
+        }
+    }
 }

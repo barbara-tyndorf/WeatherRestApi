@@ -1,6 +1,7 @@
 package pl.sda.WeatherRestApi.location;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -42,6 +43,14 @@ public class LocationController {
     @GetMapping("/name")
     public List<Location> getLocationByName(@RequestParam String name, @RequestParam int start, @RequestParam int size) {
         return locationService.findAllByName(name, start, size);
+    }
+
+    @GetMapping("/sort")
+    public List<Location> getLocationSortedBy(@RequestParam (required = false) String sort)
+//                                              ,@RequestParam int page, @RequestParam int size)
+    {
+        return locationService.sortBy(sort);
+//                , page, size);
     }
 
     @PutMapping
