@@ -1,11 +1,11 @@
 package pl.sda.WeatherRestApi.location;
 
 import org.hibernate.annotations.GenericGenerator;
+import pl.sda.WeatherRestApi.weather.Weather;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.*;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -36,6 +36,8 @@ public class Location {
     @NotEmpty
     private String country;
 
+    @OneToMany
+    private List<Weather> weather;
 
     public Location() {
     }
