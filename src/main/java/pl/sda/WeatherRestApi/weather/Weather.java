@@ -1,12 +1,13 @@
 package pl.sda.WeatherRestApi.weather;
-import org.hibernate.annotations.GenericGenerator;
 import pl.sda.WeatherRestApi.location.Location;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
-import java.util.List;
+import javax.validation.constraints.NotNull;
+import java.util.Objects;
+
 
 @Entity
 public class Weather {
@@ -23,13 +24,15 @@ public class Weather {
     @Max(1100)
     private double pressure;
 
-    @NotEmpty
-    private String humidity;
+    @NotNull
+    @Min(0)
+    private double humidity;
 
     @NotEmpty
     private String windDirection;
 
-    @NotEmpty
+    @NotNull
+    @Min(0)
     private double windSpeed;
 
     @NotEmpty
@@ -39,6 +42,17 @@ public class Weather {
     private Location location;
 
     public Weather() {
+    }
+
+    public Weather(long id, double temperature, String windDirection, double windSpeed, double pressure, double humidity, String date, Location location) {
+        this.id = id;
+        this.temperature = temperature;
+        this.windDirection = windDirection;
+        this.windSpeed = windSpeed;
+        this.pressure = pressure;
+        this.humidity = humidity;
+        this.date = date;
+        this.location = location;
     }
 
     public long getId() {
@@ -65,11 +79,11 @@ public class Weather {
         this.pressure = pressure;
     }
 
-    public String getHumidity() {
+    public double getHumidity() {
         return humidity;
     }
 
-    public void setHumidity(String humidity) {
+    public void setHumidity(double humidity) {
         this.humidity = humidity;
     }
 
@@ -117,5 +131,25 @@ public class Weather {
                 ", date='" + date + '\'' +
                 ", locationId=" + location +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Weather weather = (Weather) o;
+        return id == weather.id &&
+                Double.compare(weather.temperature, temperature) == 0 &&
+                Double.compare(weather.pressure, pressure) == 0 &&
+                Double.compare(weather.windSpeed, windSpeed) == 0 &&
+                Objects.equals(humidity, weather.humidity) &&
+                Objects.equals(windDirection, weather.windDirection) &&
+                Objects.equals(date, weather.date) &&
+                Objects.equals(location, weather.location);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, temperature, pressure, humidity, windDirection, windSpeed, date, location);
     }
 }

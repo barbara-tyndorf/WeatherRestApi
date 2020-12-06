@@ -1,55 +1,30 @@
 package pl.sda.WeatherRestApi.location;
 
-import org.hibernate.annotations.GenericGenerator;
-import pl.sda.WeatherRestApi.weather.Weather;
-
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@Entity
-public class Location {
+public class LocationDTO {
 
-    @Id
-    @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String id;
-
-    @Min(-180)
-    @Max(180)
     private double longitude;
-
-    @Min(-90)
-    @Max(90)
     private double latitude;
-
-    @NotNull
-    @NotBlank
-    @NotEmpty
     private String name;
-
     private String region;
-
-    @NotNull
-    @NotBlank
-    @NotEmpty
     private String country;
+    private List<Long> weathersIds = new ArrayList<>();
 
-    @OneToMany
-    private List<Weather> weathers = new ArrayList<>();
-
-    public Location() {
+    public LocationDTO() {
     }
 
-    public Location(String id, double longitude, double latitude, String name, String region, String country) {
+    public LocationDTO(String id, double longitude, double latitude, String name, String region, String country, List<Long> weathersIds) {
         this.id = id;
         this.longitude = longitude;
         this.latitude = latitude;
         this.name = name;
         this.region = region;
         this.country = country;
+        this.weathersIds = weathersIds;
     }
 
     public String getId() {
@@ -100,30 +75,30 @@ public class Location {
         this.country = country;
     }
 
-
-    public List<Weather> getWeathers() {
-        return weathers;
+    public List<Long> getWeathersIds() {
+        return weathersIds;
     }
 
-    public void setWeathers(List<Weather> weather) {
-        this.weathers = weather;
+    public void setWeathersIds(List<Long> weathersIds) {
+        this.weathersIds = weathersIds;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Location location = (Location) o;
-        return Double.compare(location.longitude, longitude) == 0 &&
-                Double.compare(location.latitude, latitude) == 0 &&
-                Objects.equals(id, location.id) &&
-                Objects.equals(name, location.name) &&
-                Objects.equals(region, location.region) &&
-                Objects.equals(country, location.country);
+        LocationDTO that = (LocationDTO) o;
+        return Double.compare(that.longitude, longitude) == 0 &&
+                Double.compare(that.latitude, latitude) == 0 &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(region, that.region) &&
+                Objects.equals(country, that.country) &&
+                Objects.equals(weathersIds, that.weathersIds);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, longitude, latitude, name, region, country);
+        return Objects.hash(id, longitude, latitude, name, region, country, weathersIds);
     }
 }

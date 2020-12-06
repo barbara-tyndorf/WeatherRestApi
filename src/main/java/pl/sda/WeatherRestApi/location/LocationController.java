@@ -21,32 +21,32 @@ public class LocationController {
     }
 
     @PostMapping
-    public Location add(@Valid @RequestBody Location location) {
-        return locationService.add(location);
+    public LocationDTO add(@Valid @RequestBody LocationDTO locationDTO) {
+        return locationService.add(locationDTO);
     }
 
     @GetMapping
-    public List<Location> getAll() {
+    public List<LocationDTO> getAll() {
         return locationService.getAll();
     }
 
     @GetMapping("/{id}")
-    public Location getLocationById(@PathVariable String id) {
+    public LocationDTO getLocationById(@PathVariable String id) {
         return locationService.findById(id);
     }
 
     @GetMapping("/find")
-    public List<Location> getLocations(@RequestParam(required = false) Map<String, String> params) {
+    public List<LocationDTO> getLocations(@RequestParam(required = false) Map<String, String> params) {
         return locationService.findBy(params);
     }
 
     @GetMapping("/name")
-    public List<Location> getLocationByName(@RequestParam String name, @RequestParam int start, @RequestParam int size) {
+    public List<LocationDTO> getLocationByName(@RequestParam String name, @RequestParam int start, @RequestParam int size) {
         return locationService.findAllByName(name, start, size);
     }
 
     @GetMapping("/sort")
-    public List<Location> getLocationSortedBy(@RequestParam (required = false) String sort)
+    public List<LocationDTO> getLocationSortedBy(@RequestParam (required = false) String sort)
 //                                              ,@RequestParam int page, @RequestParam int size)
     {
         return locationService.sortBy(sort);
@@ -54,13 +54,13 @@ public class LocationController {
     }
 
     @PutMapping
-    public Location update(@RequestParam String id, @Valid @RequestParam Map<String, String> params) {
+    public LocationDTO update(@RequestParam String id, @Valid @RequestParam Map<String, String> params) {
         return locationService.updateLocation(id, params);
     }
 
     @DeleteMapping
-    public String delete(Location location) {
-        locationService.deleteLocation(location);
+    public String delete(LocationDTO locationDTO) {
+        locationService.deleteLocation(locationDTO);
         return "Location removed successfully!";
     }
 }

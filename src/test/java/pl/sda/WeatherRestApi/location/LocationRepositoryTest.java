@@ -19,7 +19,7 @@ class LocationRepositoryTest {
     private TestEntityManager entityManager;
 
     @Autowired
-    private LocationDBRepository locationRepository;
+    private LocationRepository locationRepository;
 
     @Test
     void when_find_by_country_value_then_only_one_location_should_be_returned() {

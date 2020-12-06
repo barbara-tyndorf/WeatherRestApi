@@ -1,6 +1,5 @@
 package pl.sda.WeatherRestApi.location;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -8,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 
-public interface LocationDBRepository extends JpaRepository<Location, String> {
+public interface LocationRepository extends JpaRepository<Location, String> {
 
     List<Location> findAllByName(String name, Pageable pageable);
 
